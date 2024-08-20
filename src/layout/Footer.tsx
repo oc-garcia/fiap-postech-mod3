@@ -4,7 +4,12 @@ import { Box, Container, Stack, Text, useColorModeValue } from "@chakra-ui/react
 
 export default function Footer() {
   return (
-    <Box bg={useColorModeValue("gray.50", "gray.900")} color={useColorModeValue("gray.700", "gray.200")}>
+    <Box
+      borderTop={1}
+      borderStyle={"solid"}
+      borderColor={useColorModeValue("gray.200", "gray.900")}
+      bg={useColorModeValue("white", "gray.800")}
+      color={useColorModeValue("gray.600", "white")}>
       <Container
         as={Stack}
         maxW={"6xl"}
