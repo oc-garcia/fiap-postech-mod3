@@ -1,5 +1,6 @@
 import React from "react";
-import AppHeader from "./AppHeader";
+import Header from "./AppHeader";
+import Footer from "./Footer";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -8,11 +9,9 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="app-layout">
-      <AppHeader />
-      <main>{children}</main>
-      <footer>
-        <p>© 2023 My Application</p>
-      </footer>
+      <Header />
+      <main className="app-main-container">{children}</main>
+      <Footer />
     </div>
   );
 };

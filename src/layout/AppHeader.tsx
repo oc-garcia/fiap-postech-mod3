@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
-export default function AppHeader() {
+export default function Header() {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -46,7 +46,7 @@ export default function AppHeader() {
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
             color={useColorModeValue("gray.800", "white")}>
-            Student Blog
+            FIAP Blogging
           </Text>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>

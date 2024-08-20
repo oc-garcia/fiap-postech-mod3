@@ -10,3 +10,13 @@ body {
   overflow-x: hidden;
   line-height: 1;
 }
+
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main-container {
+  flex: 1;
+}
