@@ -65,7 +65,7 @@ export default function Header() {
             fontWeight={600}
             color={"white"}
             bg={"pink.400"}
-            href={"/signup"}
+            href={"/register"}
             _hover={{
               bg: "pink.300",
             }}>
@@ -226,11 +226,7 @@ const NAV_ITEMS: Array<NavItem> = [
     href: "/",
   },
   {
-    label: "Blog Posts",
-    href: "/posts",
-  },
-  {
-    label: "Create Post",
-    href: "/create-post",
+    label: "Admin",
+    href: "/admin",
   },
 ];
