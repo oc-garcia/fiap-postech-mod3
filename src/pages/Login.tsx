@@ -70,6 +70,9 @@ export default function Login() {
                       }}>
                       Login
                     </Button>
+                    <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} href={"/register"}>
+                      Not a member? Sign Up
+                    </Button>
                   </VStack>
                 </form>
               )}
