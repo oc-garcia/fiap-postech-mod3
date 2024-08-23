@@ -7,16 +7,16 @@ import Admin from "./pages/Admin";
 
 function AppRouter() {
   return (
-    <AppLayout>
-      <Router>
+    <Router>
+      <AppLayout>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
-      </Router>
-    </AppLayout>
+      </AppLayout>
+    </Router>
   );
 }
 

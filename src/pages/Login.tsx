@@ -13,6 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   return (
@@ -70,9 +71,11 @@ export default function Login() {
                       }}>
                       Login
                     </Button>
-                    <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} href={"/register"}>
-                      Not a member? Sign Up
-                    </Button>
+                    <Link to={"/register"}>
+                      <Button fontSize={"sm"} fontWeight={400} variant={"link"}>
+                        Not a member? Sign Up
+                      </Button>
+                    </Link>
                   </VStack>
                 </form>
               )}
