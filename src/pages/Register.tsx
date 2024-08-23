@@ -14,6 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
 import { Link } from "react-router-dom";
+import { IUser } from "../interfaces/IUser";
+import { userService } from "../services/UserService";
 
 export default function Register() {
   return (
@@ -27,19 +29,30 @@ export default function Register() {
           <Stack spacing="4">
             <Formik
               initialValues={{
-                email: "",
+                username: "",
+                name: "",
+                cpf: "",
                 password: "",
-                rememberMe: false,
+                confirmPassword: "",
               }}
-              onSubmit={(values) => {
-                alert(JSON.stringify(values, null, 2));
+              onSubmit={async (values: IUser) => {
+                const registerResponse = await userService.register(values);
+                console.log(registerResponse);
               }}>
               {({ handleSubmit, errors, touched }) => (
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={4} align="flex-start">
                     <FormControl>
-                      <FormLabel htmlFor="email">Email Address</FormLabel>
-                      <Field as={Input} id="email" name="email" type="email" variant="filled" />
+                      <FormLabel htmlFor="username">Username</FormLabel>
+                      <Field as={Input} id="username" name="username" type="username" variant="filled" />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="name">Name</FormLabel>
+                      <Field as={Input} id="name" name="name" type="name" variant="filled" />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="cpf">CPF</FormLabel>
+                      <Field as={Input} id="cpf" name="cpf" type="cpf" variant="filled" />
                     </FormControl>
                     <FormControl isInvalid={!!errors.password && touched.password}>
                       <FormLabel htmlFor="password">Password</FormLabel>
@@ -49,7 +62,7 @@ export default function Register() {
                         name="password"
                         type="password"
                         variant="filled"
-                        validate={(value) => {
+                        validate={(value: string) => {
                           let error;
                           if (value.length < 6) {
                             error = "Password must contain at least 6 characters";
@@ -59,15 +72,15 @@ export default function Register() {
                       />
                       <FormErrorMessage>{errors.password}</FormErrorMessage>
                     </FormControl>
-                    <FormControl isInvalid={!!errors.password && touched.password}>
-                      <FormLabel htmlFor="password">Confirm Password</FormLabel>
+                    <FormControl isInvalid={!!errors.confirmPassword && touched.confirmPassword}>
+                      <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
                       <Field
                         as={Input}
-                        id="password"
-                        name="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
                         type="password"
                         variant="filled"
-                        validate={(value) => {
+                        validate={(value: string) => {
                           let error;
                           if (value.length < 6) {
                             error = "Password must contain at least 6 characters";

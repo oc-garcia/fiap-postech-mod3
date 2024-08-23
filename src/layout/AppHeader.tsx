@@ -46,6 +46,7 @@ export default function Header() {
           <Text
             display={"flex"}
             gap={1}
+            fontSize={"xl"}
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
             color={useColorModeValue("gray.800", "white")}>

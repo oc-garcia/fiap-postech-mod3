@@ -14,6 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
 import { Link } from "react-router-dom";
+import { IUserCredentials } from "../interfaces/IUser";
+import { userService } from "../services/UserService";
 
 export default function Login() {
   return (
@@ -27,19 +29,19 @@ export default function Login() {
           <Stack spacing="4">
             <Formik
               initialValues={{
-                email: "",
+                username: "",
                 password: "",
-                rememberMe: false,
               }}
-              onSubmit={(values) => {
-                alert(JSON.stringify(values, null, 2));
+              onSubmit={async (values: IUserCredentials) => {
+                const loginResponse = await userService.login(values);
+                console.log(loginResponse);
               }}>
               {({ handleSubmit, errors, touched }) => (
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={4} align="flex-start">
                     <FormControl>
-                      <FormLabel htmlFor="email">Email Address</FormLabel>
-                      <Field as={Input} id="email" name="email" type="email" variant="filled" />
+                      <FormLabel htmlFor="username">Username</FormLabel>
+                      <Field as={Input} id="username" name="username" type="text" variant="filled" />
                     </FormControl>
                     <FormControl isInvalid={!!errors.password && touched.password}>
                       <FormLabel htmlFor="password">Password</FormLabel>
@@ -49,7 +51,7 @@ export default function Login() {
                         name="password"
                         type="password"
                         variant="filled"
-                        validate={(value) => {
+                        validate={(value: string) => {
                           let error;
                           if (value.length < 6) {
                             error = "Password must contain at least 6 characters";
