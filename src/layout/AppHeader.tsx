@@ -15,13 +15,33 @@ import {
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
+  useColorMode,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const { isOpen, onToggle } = useDisclosure();
+  const { colorMode, toggleColorMode } = useColorMode();
+  const [isLightTheme, setIsLightTheme] = useState(colorMode === "light");
 
+  useEffect(() => {
+    const savedColorMode = localStorage.getItem("chakra-ui-color-mode");
+    if (savedColorMode) {
+      if (savedColorMode !== colorMode) {
+        toggleColorMode();
+      }
+      setIsLightTheme(savedColorMode === "light");
+    }
+  }, [colorMode, toggleColorMode]);
+
+  const handleThemeToggle = () => {
+    toggleColorMode();
+    const newColorMode = colorMode === "light" ? "dark" : "light";
+    localStorage.setItem("chakra-ui-color-mode", newColorMode);
+    setIsLightTheme(newColorMode === "light");
+  };
   return (
     <Box>
       <Flex
@@ -55,7 +75,7 @@ export default function Header() {
               textAlign={useBreakpointValue({ base: "center", md: "left" })}
               fontFamily={"heading"}
               fontWeight={700}
-              color={useColorModeValue("pink.400", "white")}>
+              color={"pink.400"}>
               FIAP
             </Text>
             Blogging
@@ -67,6 +87,11 @@ export default function Header() {
         </Flex>
 
         <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
+          <IconButton
+            aria-label="Toggle theme"
+            icon={isLightTheme ? <SunIcon /> : <MoonIcon />}
+            onClick={handleThemeToggle}
+          />
           <Link to={"/login"}>
             <Button pt={"0.5rem"} fontSize={"sm"} fontWeight={400} variant={"link"}>
               Log In
@@ -153,6 +178,7 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
             </Text>
             <Text fontSize={"sm"}>{subLabel}</Text>
           </Box>
+
           <Flex
             transition={"all .3s ease"}
             transform={"translateX(-10px)"}

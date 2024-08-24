@@ -16,6 +16,26 @@ import { Field, Formik } from "formik";
 import { Link } from "react-router-dom";
 import { IUser } from "../interfaces/IUser";
 import { userService } from "../services/UserService";
+import { z } from "zod";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+
+const registerSchema = z
+  .object({
+    username: z.string().min(1, "Username is required"),
+    name: z.string().min(1, "Name is required"),
+    cpf: z.string().min(1, "CPF is required"),
+    password: z.string().min(6, "Password must contain at least 6 characters"),
+    confirmPassword: z.string().min(6, "Password must contain at least 6 characters"),
+  })
+  .superRefine(({ password, confirmPassword }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "The passwords did not match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
 
 export default function Register() {
   return (
@@ -35,6 +55,7 @@ export default function Register() {
                 password: "",
                 confirmPassword: "",
               }}
+              validationSchema={toFormikValidationSchema(registerSchema)}
               onSubmit={async (values: IUser) => {
                 const registerResponse = await userService.register(values);
                 console.log(registerResponse);
@@ -42,53 +63,30 @@ export default function Register() {
               {({ handleSubmit, errors, touched }) => (
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={4} align="flex-start">
-                    <FormControl>
+                    <FormControl isInvalid={!!errors.username && touched.username}>
                       <FormLabel htmlFor="username">Username</FormLabel>
-                      <Field as={Input} id="username" name="username" type="username" variant="filled" />
+                      <Field as={Input} id="username" name="username" type="text" variant="filled" />
+                      <FormErrorMessage>{errors.username}</FormErrorMessage>
                     </FormControl>
-                    <FormControl>
+                    <FormControl isInvalid={!!errors.name && touched.name}>
                       <FormLabel htmlFor="name">Name</FormLabel>
-                      <Field as={Input} id="name" name="name" type="name" variant="filled" />
+                      <Field as={Input} id="name" name="name" type="text" variant="filled" />
+                      <FormErrorMessage>{errors.name}</FormErrorMessage>
                     </FormControl>
-                    <FormControl>
+                    <FormControl isInvalid={!!errors.cpf && touched.cpf}>
                       <FormLabel htmlFor="cpf">CPF</FormLabel>
-                      <Field as={Input} id="cpf" name="cpf" type="cpf" variant="filled" />
+                      <Field as={Input} id="cpf" name="cpf" type="text" variant="filled" />
+                      <FormErrorMessage>{errors.cpf}</FormErrorMessage>
                     </FormControl>
                     <FormControl isInvalid={!!errors.password && touched.password}>
                       <FormLabel htmlFor="password">Password</FormLabel>
-                      <Field
-                        as={Input}
-                        id="password"
-                        name="password"
-                        type="password"
-                        variant="filled"
-                        validate={(value: string) => {
-                          let error;
-                          if (value.length < 6) {
-                            error = "Password must contain at least 6 characters";
-                          }
-                          return error;
-                        }}
-                      />
+                      <Field as={Input} id="password" name="password" type="password" variant="filled" />
                       <FormErrorMessage>{errors.password}</FormErrorMessage>
                     </FormControl>
                     <FormControl isInvalid={!!errors.confirmPassword && touched.confirmPassword}>
                       <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-                      <Field
-                        as={Input}
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type="password"
-                        variant="filled"
-                        validate={(value: string) => {
-                          let error;
-                          if (value.length < 6) {
-                            error = "Password must contain at least 6 characters";
-                          }
-                          return error;
-                        }}
-                      />
-                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                      <Field as={Input} id="confirmPassword" name="confirmPassword" type="password" variant="filled" />
+                      <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
                     </FormControl>
                     <Button
                       type="submit"
@@ -100,7 +98,7 @@ export default function Register() {
                       _hover={{
                         bg: "pink.300",
                       }}>
-                      Login
+                      Register
                     </Button>
                     <Link to={"/login"}>
                       <Button fontSize={"sm"} fontWeight={400} variant={"link"}>

@@ -1,10 +1,10 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { IUser, IUserCredentials } from "../interfaces/IUser";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
 export const userService = {
-  register: async (user: IUser) => {
+  register: async (user: IUser): Promise<AxiosResponse | AxiosError> => {
     const data = user;
     const config = {
       method: "post",
@@ -18,10 +18,13 @@ export const userService = {
       const response = await axios(config);
       return response;
     } catch (error) {
-      return error;
+      if (axios.isAxiosError(error)) {
+        throw error as AxiosError;
+      }
+      throw error as AxiosError;
     }
   },
-  login: async (user: IUserCredentials) => {
+  login: async (user: IUserCredentials): Promise<AxiosResponse | AxiosError> => {
     const data = user;
     const config = {
       method: "post",
@@ -32,10 +35,13 @@ export const userService = {
     };
 
     try {
-      const response = await axios(config);
+      const response: AxiosResponse = await axios(config);
       return response;
     } catch (error) {
-      return error;
+      if (axios.isAxiosError(error)) {
+        throw error as AxiosError;
+      }
+      throw error as AxiosError;
     }
   },
 };

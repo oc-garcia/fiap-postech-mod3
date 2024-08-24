@@ -18,7 +18,6 @@ body {
 }
 
 .app-main-container {
-  background-color: #f7fafc;
   display: flex;
   flex-direction: column;
   flex: 1;
