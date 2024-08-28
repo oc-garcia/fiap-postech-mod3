@@ -16,15 +16,25 @@ import {
   useBreakpointValue,
   useDisclosure,
   useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "../contexts/AppContext";
 
 export default function Header() {
   const { isOpen, onToggle } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
   const [isLightTheme, setIsLightTheme] = useState(colorMode === "light");
+
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error("MyComponent must be used within an AppProvider");
+  }
+
+  const { token, setToken } = context;
 
   useEffect(() => {
     const savedColorMode = localStorage.getItem("chakra-ui-color-mode");
@@ -92,12 +102,29 @@ export default function Header() {
             icon={isLightTheme ? <SunIcon /> : <MoonIcon />}
             onClick={handleThemeToggle}
           />
-          <Link to={"/login"}>
-            <Button pt={"0.5rem"} fontSize={"sm"} fontWeight={400} variant={"link"}>
-              Log In
-            </Button>
-          </Link>
-          <Link to={"/register"}>
+          {!token && (
+            <>
+              <Link to={"/login"}>
+                <Button pt={"0.5rem"} fontSize={"sm"} fontWeight={400} variant={"link"}>
+                  Log In
+                </Button>
+              </Link>
+              <Link to={"/register"}>
+                <Button
+                  display={{ base: "none", md: "inline-flex" }}
+                  fontSize={"sm"}
+                  fontWeight={600}
+                  color={"white"}
+                  bg={"pink.400"}
+                  _hover={{
+                    bg: "pink.300",
+                  }}>
+                  Sign Up
+                </Button>
+              </Link>
+            </>
+          )}
+          {token && (
             <Button
               display={{ base: "none", md: "inline-flex" }}
               fontSize={"sm"}
@@ -106,10 +133,14 @@ export default function Header() {
               bg={"pink.400"}
               _hover={{
                 bg: "pink.300",
+              }}
+              onClick={() => {
+                setToken("");
+                localStorage.removeItem("authToken");
               }}>
-              Sign Up
+              Log Out
             </Button>
-          </Link>
+          )}
         </Stack>
       </Flex>
 
@@ -125,9 +156,17 @@ const DesktopNav = () => {
   const linkHoverColor = useColorModeValue("gray.800", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error("MyComponent must be used within an AppProvider");
+  }
+
+  const { token } = context;
+
   return (
     <Stack direction={"row"} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
+      {NAV_ITEMS.filter((navItem) => navItem.label !== "Admin" || token).map((navItem) => (
         <Box key={navItem.label}>
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
@@ -208,6 +247,29 @@ const MobileNav = () => {
 const MobileNavItem = ({ label, children, href }: NavItem) => {
   const { isOpen, onToggle } = useDisclosure();
 
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error("MyComponent must be used within an AppProvider");
+  }
+  const toast = useToast();
+
+  const { token } = context;
+  const navigate = useNavigate();
+
+  const handleNavigate = (href: string | undefined) => {
+    if (!token) {
+      toast({
+        title: `You need to be logged in to access this page`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      navigate(href ?? "#");
+    }
+  };
+
   return (
     <Stack spacing={4} onClick={children && onToggle}>
       <Box
@@ -242,9 +304,9 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           align={"start"}>
           {children &&
             children.map((child) => (
-              <Link key={child.label} to={href ?? "#"}>
+              <Text key={child.label} onClick={() => handleNavigate(child.href)} py={2} fontWeight={600}>
                 {child.label}
-              </Link>
+              </Text>
             ))}
         </Stack>
       </Collapse>
@@ -261,7 +323,7 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: "Home",
+    label: "Posts",
     href: "/",
   },
   {

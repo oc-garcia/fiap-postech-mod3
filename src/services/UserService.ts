@@ -36,6 +36,10 @@ export const userService = {
 
     try {
       const response: AxiosResponse = await axios(config);
+      if ("data" in response) {
+        const token = response.data.token;
+        localStorage.setItem("authToken", token);
+      }
       return response;
     } catch (error) {
       if (axios.isAxiosError(error)) {

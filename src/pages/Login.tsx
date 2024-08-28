@@ -20,6 +20,8 @@ import { userService } from "../services/UserService";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import axios from "axios";
+import { useContext } from "react";
+import { AppContext } from "../contexts/AppContext";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -29,6 +31,14 @@ const loginSchema = z.object({
 export default function Login() {
   const toast = useToast();
   const navigate = useNavigate();
+  
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error("MyComponent must be used within an AppProvider");
+  }
+
+  const { setToken } = context;
 
   return (
     <Center flex={"1"}>
@@ -48,19 +58,16 @@ export default function Login() {
               onSubmit={async (values: IUserCredentials) => {
                 try {
                   const loginResponse = await userService.login(values);
-                  if (loginResponse.status == 200) {
-                    if ("data" in loginResponse) {
-                      const token = loginResponse.data.token;
-                      localStorage.setItem("authToken", token);
-                      toast({
-                        title: `Logged in`,
-                        status: "success",
-                        duration: 3000,
-                        isClosable: true,
-                      });
-                    }
+                  if ("data" in loginResponse && loginResponse.status === 200 && loginResponse.data.token) {
+                    setToken(loginResponse.data.token);
+                    toast({
+                      title: `Logged in`,
+                      status: "success",
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                    navigate("/");
                   }
-                  navigate("/");
                 } catch (error) {
                   if (axios.isAxiosError(error)) {
                     toast({

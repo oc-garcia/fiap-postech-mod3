@@ -10,14 +10,16 @@ import {
   Heading,
   Input,
   Stack,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IUser } from "../interfaces/IUser";
 import { userService } from "../services/UserService";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
+import axios from "axios";
 
 const registerSchema = z
   .object({
@@ -38,6 +40,8 @@ const registerSchema = z
   });
 
 export default function Register() {
+  const toast = useToast();
+  const navigate = useNavigate();
   return (
     <Center flex={"1"}>
       <Card>
@@ -57,8 +61,36 @@ export default function Register() {
               }}
               validationSchema={toFormikValidationSchema(registerSchema)}
               onSubmit={async (values: IUser) => {
-                const registerResponse = await userService.register(values);
-                console.log(registerResponse);
+                try {
+                  const registerResponse = await userService.register(values);
+                  if (registerResponse.status == 201) {
+                    toast({
+                      title: `Registered successfully`,
+                      status: "success",
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                    navigate("/login");
+                  }
+                } catch (error) {
+                  if (axios.isAxiosError(error)) {
+                    toast({
+                      title: `Error registering`,
+                      description: `${error.response?.data?.message || error.message}`,
+                      status: "error",
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  } else {
+                    toast({
+                      title: `Error registering`,
+                      description: `An unexpected error occurred`,
+                      status: "error",
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  }
+                }
               }}>
               {({ handleSubmit, errors, touched }) => (
                 <form onSubmit={handleSubmit}>
