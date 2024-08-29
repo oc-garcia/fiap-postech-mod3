@@ -8,17 +8,15 @@ import {
   Button,
   Stack,
   Collapse,
-  Icon,
   Popover,
   PopoverTrigger,
-  PopoverContent,
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
@@ -36,6 +34,8 @@ export default function Header() {
 
   const { token, setToken } = context;
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const savedColorMode = localStorage.getItem("chakra-ui-color-mode");
     if (savedColorMode) {
@@ -51,6 +51,12 @@ export default function Header() {
     const newColorMode = colorMode === "light" ? "dark" : "light";
     localStorage.setItem("chakra-ui-color-mode", newColorMode);
     setIsLightTheme(newColorMode === "light");
+  };
+
+  const handleLogout = () => {
+    setToken("");
+    localStorage.removeItem("authToken");
+    navigate("/login");
   };
   return (
     <Box>
@@ -96,7 +102,7 @@ export default function Header() {
           </Flex>
         </Flex>
 
-        <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
+        <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} alignItems={"center"} direction={"row"} spacing={6}>
           <IconButton
             aria-label="Toggle theme"
             icon={isLightTheme ? <SunIcon /> : <MoonIcon />}
@@ -105,7 +111,7 @@ export default function Header() {
           {!token && (
             <>
               <Link to={"/login"}>
-                <Button pt={"0.5rem"} fontSize={"sm"} fontWeight={400} variant={"link"}>
+                <Button display={{ base: "none", md: "inline-flex" }} fontSize={"sm"} fontWeight={400} variant={"link"}>
                   Log In
                 </Button>
               </Link>
@@ -134,10 +140,7 @@ export default function Header() {
               _hover={{
                 bg: "pink.300",
               }}
-              onClick={() => {
-                setToken("");
-                localStorage.removeItem("authToken");
-              }}>
+              onClick={handleLogout}>
               Log Out
             </Button>
           )}
@@ -154,7 +157,6 @@ export default function Header() {
 const DesktopNav = () => {
   const linkColor = useColorModeValue("gray.600", "gray.200");
   const linkHoverColor = useColorModeValue("gray.800", "white");
-  const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
   const context = useContext(AppContext);
 
@@ -164,36 +166,42 @@ const DesktopNav = () => {
 
   const { token } = context;
 
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  const handleNavigate = (href: string | undefined) => {
+    if (!token) {
+      toast({
+        title: `You need to be logged in to access this page`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      navigate(href ?? "#");
+    }
+  };
+
   return (
     <Stack direction={"row"} spacing={4}>
       {NAV_ITEMS.filter((navItem) => navItem.label !== "Admin" || token).map((navItem) => (
         <Box key={navItem.label}>
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
-              <Link to={navItem.href ?? "#"}>
-                <Box
-                  p={2}
-                  fontSize={"sm"}
-                  fontWeight={500}
-                  color={linkColor}
-                  _hover={{
-                    textDecoration: "none",
-                    color: linkHoverColor,
-                  }}>
-                  {navItem.label}
-                </Box>
-              </Link>
+              <Box
+                cursor={"pointer"}
+                onClick={() => handleNavigate(navItem.href)}
+                p={2}
+                fontSize={"sm"}
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: "none",
+                  color: linkHoverColor,
+                }}>
+                {navItem.label}
+              </Box>
             </PopoverTrigger>
-
-            {navItem.children && (
-              <PopoverContent border={0} boxShadow={"xl"} bg={popoverContentBgColor} p={4} rounded={"xl"} minW={"sm"}>
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
           </Popover>
         </Box>
       ))}
@@ -201,52 +209,25 @@ const DesktopNav = () => {
   );
 };
 
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
-  return (
-    <Link to={href ?? "#"}>
-      <Box
-        role={"group"}
-        display={"block"}
-        p={2}
-        rounded={"md"}
-        _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}>
-        <Stack direction={"row"} align={"center"}>
-          <Box>
-            <Text transition={"all .3s ease"} _groupHover={{ color: "pink.400" }} fontWeight={500}>
-              {label}
-            </Text>
-            <Text fontSize={"sm"}>{subLabel}</Text>
-          </Box>
-
-          <Flex
-            transition={"all .3s ease"}
-            transform={"translateX(-10px)"}
-            opacity={0}
-            _groupHover={{ opacity: "100%", transform: "translateX(0)" }}
-            justify={"flex-end"}
-            align={"center"}
-            flex={1}>
-            <Icon color={"pink.400"} w={5} h={5} as={ChevronRightIcon} />
-          </Flex>
-        </Stack>
-      </Box>
-    </Link>
-  );
-};
-
 const MobileNav = () => {
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error("MyComponent must be used within an AppProvider");
+  }
+
+  const { token } = context;
+
   return (
     <Stack bg={useColorModeValue("white", "gray.800")} p={4} display={{ md: "none" }}>
-      {NAV_ITEMS.map((navItem) => (
+      {NAV_ITEMS.filter((navItem) => navItem.label !== "Admin" || token).map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
-  const { isOpen, onToggle } = useDisclosure();
-
+const MobileNavItem = ({ label, href }: NavItem) => {
   const context = useContext(AppContext);
 
   if (!context) {
@@ -271,7 +252,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
   };
 
   return (
-    <Stack spacing={4} onClick={children && onToggle}>
+    <Stack spacing={4}>
       <Box
         as="span"
         justifyContent="space-between"
@@ -279,37 +260,15 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         _hover={{
           textDecoration: "none",
         }}>
-        <Link to={href ?? "#"}>
-          <Text py={2} fontWeight={600} color={useColorModeValue("gray.600", "gray.200")}>
-            {label}
-          </Text>
-          {children && (
-            <Icon
-              as={ChevronDownIcon}
-              transition={"all .25s ease-in-out"}
-              transform={isOpen ? "rotate(180deg)" : ""}
-              w={6}
-              h={6}
-            />
-          )}
-        </Link>
+        <Text
+          cursor={"pointer"}
+          onClick={() => handleNavigate(href)}
+          py={2}
+          fontWeight={600}
+          color={useColorModeValue("gray.600", "gray.200")}>
+          {label}
+        </Text>
       </Box>
-      <Collapse in={isOpen} animateOpacity style={{ marginTop: "0!important" }}>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle={"solid"}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          align={"start"}>
-          {children &&
-            children.map((child) => (
-              <Text key={child.label} onClick={() => handleNavigate(child.href)} py={2} fontWeight={600}>
-                {child.label}
-              </Text>
-            ))}
-        </Stack>
-      </Collapse>
     </Stack>
   );
 };
