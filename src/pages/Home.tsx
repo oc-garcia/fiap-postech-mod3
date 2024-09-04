@@ -6,6 +6,7 @@ import { IPost } from "../interfaces/IPost";
 import axios, { AxiosResponse } from "axios";
 import {
   Box,
+  Button,
   Card,
   CardBody,
   CardFooter,
@@ -13,6 +14,10 @@ import {
   Divider,
   Flex,
   Heading,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  InputRightAddon,
   Skeleton,
   Stack,
   StackDivider,
@@ -24,6 +29,7 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
 
 export default function Home() {
   const context = useContext(AppContext);
@@ -140,8 +146,25 @@ export default function Home() {
               ))}
             </Flex>
           </TabPanel>
-          <TabPanel>
-            <p>two!</p>
+          <TabPanel padding={0}>
+            <Card width="100%" height="100%" padding="1rem">
+              <InputGroup>
+                <InputLeftAddon>Keyword</InputLeftAddon>
+                <Input type="text" />
+                <InputRightAddon padding={0}>
+                  <Button
+                    color={"white"}
+                    bg={"pink.400"}
+                    borderRadius={"0 5px 5px 0"}
+                    _hover={{
+                      bg: "pink.300",
+                    }}
+                    rightIcon={<SearchIcon />}>
+                    Submit
+                  </Button>
+                </InputRightAddon>
+              </InputGroup>
+            </Card>
           </TabPanel>
         </TabPanels>
       </Tabs>

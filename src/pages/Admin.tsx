@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { Flex, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useColorModeValue } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ export default function Admin() {
 
   const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const tabListColor = useColorModeValue("gray.600", "gray.200");
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -58,7 +59,7 @@ export default function Admin() {
   return (
     <Flex flexDirection={"column"} gap={"1rem"}>
       <Tabs isFitted variant="unstyled">
-        <TabList mb="1em">
+        <TabList mb="1em" color={tabListColor}>
           <Tab
             borderBottom="1px solid"
             borderColor="pink.400"
@@ -71,7 +72,6 @@ export default function Admin() {
               borderRight: "1px solid",
               borderBottom: "1px solid transparent",
               background: "rgba(255, 192, 203,  0.05)",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             }}>
             Post Manager
           </Tab>
@@ -86,17 +86,17 @@ export default function Admin() {
               borderRight: "1px solid",
               borderBottom: "1px solid transparent",
               background: "rgba(255, 192, 203, 0.05)",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             }}>
             User Manager
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <p>one!</p>
+          <TabPanel padding={0}>
+            <p>Post Manager</p>
+            <pre>{JSON.stringify(posts, null, 2)}</pre>{" "}
           </TabPanel>
-          <TabPanel>
-            <p>two!</p>
+          <TabPanel padding={0}>
+            <p>User Manager</p>
           </TabPanel>
         </TabPanels>
       </Tabs>
