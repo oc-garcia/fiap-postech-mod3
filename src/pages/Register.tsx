@@ -20,6 +20,7 @@ import { userService } from "../services/UserService";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import axios from "axios";
+import { useState } from "react";
 
 const registerSchema = z
   .object({
@@ -42,6 +43,8 @@ const registerSchema = z
 export default function Register() {
   const toast = useToast();
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   return (
     <Center flex={"1"}>
       <Card>
@@ -61,6 +64,8 @@ export default function Register() {
               }}
               validationSchema={toFormikValidationSchema(registerSchema)}
               onSubmit={async (values: IUser) => {
+                setIsSubmitting(true);
+
                 try {
                   const registerResponse = await userService.register(values);
                   if (registerResponse.status == 201) {
@@ -90,6 +95,8 @@ export default function Register() {
                       isClosable: true,
                     });
                   }
+                } finally {
+                  setIsSubmitting(false);
                 }
               }}>
               {({ handleSubmit, errors, touched }) => (
@@ -121,6 +128,7 @@ export default function Register() {
                       <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
                     </FormControl>
                     <Button
+                      isLoading={isSubmitting}
                       type="submit"
                       fontSize={"sm"}
                       fontWeight={600}

@@ -20,7 +20,7 @@ import { userService } from "../services/UserService";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
 
 const loginSchema = z.object({
@@ -31,7 +31,8 @@ const loginSchema = z.object({
 export default function Login() {
   const toast = useToast();
   const navigate = useNavigate();
-  
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const context = useContext(AppContext);
 
   if (!context) {
@@ -56,6 +57,7 @@ export default function Login() {
               }}
               validationSchema={toFormikValidationSchema(loginSchema)}
               onSubmit={async (values: IUserCredentials) => {
+                setIsSubmitting(true);
                 try {
                   const loginResponse = await userService.login(values);
                   if ("data" in loginResponse && loginResponse.status === 200 && loginResponse.data.token) {
@@ -86,6 +88,8 @@ export default function Login() {
                       isClosable: true,
                     });
                   }
+                } finally {
+                  setIsSubmitting(false);
                 }
               }}>
               {({ handleSubmit, errors, touched }) => (
@@ -102,6 +106,7 @@ export default function Login() {
                       <FormErrorMessage>{errors.password}</FormErrorMessage>
                     </FormControl>
                     <Button
+                      isLoading={isSubmitting}
                       type="submit"
                       fontSize={"sm"}
                       fontWeight={600}
