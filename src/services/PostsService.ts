@@ -44,7 +44,7 @@ export const PostsService = {
     const config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `${baseUrl}/post/search?keyword=${keyword}`,
+      url: `${baseUrl}/post/wordkey/${keyword}`,
       headers: {},
     };
 

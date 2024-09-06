@@ -93,7 +93,7 @@ export default function Admin() {
         <TabPanels>
           <TabPanel padding={0}>
             <p>Post Manager</p>
-            <pre>{JSON.stringify(posts, null, 2)}</pre>{" "}
+            <pre>{JSON.stringify(posts, null, 2)}</pre>
           </TabPanel>
           <TabPanel padding={0}>
             <p>User Manager</p>

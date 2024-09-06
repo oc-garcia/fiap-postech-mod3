@@ -28,6 +28,7 @@ import {
   Tabs,
   Text,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
@@ -35,6 +36,7 @@ export default function Home() {
   const context = useContext(AppContext);
   const navigate = useNavigate();
   const tabListColor = useColorModeValue("gray.600", "gray.200");
+  const toast = useToast();
 
   if (!context) {
     throw new Error("MyComponent must be used within an AppProvider");
@@ -44,6 +46,9 @@ export default function Home() {
 
   const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [keyword, setKeyword] = useState<string>("");
+  const [keywordSearchResults, setKeywordSearchResults] = useState<IPost[]>([]);
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -71,6 +76,32 @@ export default function Home() {
       navigate("/login");
     }
   }, [setToken, navigate]);
+
+  const handleKeywordSearch = async () => {
+    setSearchLoading(true);
+    try {
+      const response = await PostsService.getByKeyword(keyword);
+      if ("data" in response) {
+        if (response.data.length === 0) {
+          toast({
+            title: `No posts found with the keyword provided.`,
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+        setKeywordSearchResults(response.data);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Failed to fetch posts", error.response?.data || error.message);
+      } else {
+        console.error("Failed to fetch posts", error);
+      }
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -147,24 +178,56 @@ export default function Home() {
             </Flex>
           </TabPanel>
           <TabPanel padding={0}>
-            <Card width="100%" height="100%" padding="1rem">
-              <InputGroup>
-                <InputLeftAddon>Keyword</InputLeftAddon>
-                <Input type="text" />
-                <InputRightAddon padding={0}>
-                  <Button
-                    color={"white"}
-                    bg={"pink.400"}
-                    borderRadius={"0 5px 5px 0"}
-                    _hover={{
-                      bg: "pink.300",
-                    }}
-                    rightIcon={<SearchIcon />}>
-                    Submit
-                  </Button>
-                </InputRightAddon>
-              </InputGroup>
-            </Card>
+            <Flex flexDirection={"column"} gap={3}>
+              <Card width="100%" height="100%" padding="1rem">
+                <InputGroup>
+                  <InputLeftAddon>Keyword</InputLeftAddon>
+                  <Input type="text" onChange={(e) => setKeyword(e.target.value)} />
+                  <InputRightAddon padding={0}>
+                    <Button
+                      isLoading={searchLoading}
+                      isDisabled={keyword == ""}
+                      onClick={handleKeywordSearch}
+                      color={"white"}
+                      bg={"pink.400"}
+                      borderRadius={"0 5px 5px 0"}
+                      _hover={{
+                        bg: "pink.300",
+                      }}
+                      rightIcon={<SearchIcon />}>
+                      Submit
+                    </Button>
+                  </InputRightAddon>
+                </InputGroup>
+              </Card>
+              <Flex flexDirection={"column"} gap={3}>
+                {keywordSearchResults.map((post) => (
+                  <Card key={post.id}>
+                    <CardHeader>
+                      <Heading size="md">{post.title}</Heading>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody>
+                      <Box>
+                        <Text pt="2" fontSize="sm">
+                          {post.content}
+                        </Text>
+                      </Box>
+                    </CardBody>
+                    <Divider />
+                    <CardFooter>
+                      <Stack direction="row" divider={<StackDivider borderColor="gray.200" />} spacing={4}>
+                        <Text>Author: {post.author}</Text>
+                        {post.creation_date && (
+                          <Text>Created: {new Date(post.creation_date).toLocaleString("pt-BR")}</Text>
+                        )}
+                        {post.update_date && <Text>Updated: {new Date(post.update_date).toLocaleString("pt-BR")}</Text>}
+                      </Stack>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </Flex>
+            </Flex>
           </TabPanel>
         </TabPanels>
       </Tabs>
