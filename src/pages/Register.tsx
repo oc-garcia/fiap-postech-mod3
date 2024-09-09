@@ -26,7 +26,10 @@ const registerSchema = z
   .object({
     username: z.string().min(1, "Username is required"),
     name: z.string().min(1, "Name is required"),
-    cpf: z.string().min(1, "CPF is required"),
+    cpf: z
+      .string()
+      .length(11, "CPF must be exactly 11 characters")
+      .regex(/^\d{11}$/, "CPF must contain only numbers"),
     password: z.string().min(6, "Password must contain at least 6 characters"),
     confirmPassword: z.string().min(6, "Password must contain at least 6 characters"),
   })

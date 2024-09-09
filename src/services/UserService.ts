@@ -48,4 +48,22 @@ export const userService = {
       throw error as AxiosError;
     }
   },
+  getAllUsers: async (): Promise<AxiosResponse<IUser[]>> => {
+    const config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `${baseUrl}/user`,
+      headers: {},
+    };
+
+    try {
+      const response: AxiosResponse<IUser[]> = await axios(config);
+      return response;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return error.response as AxiosResponse<IUser[]>;
+      }
+      throw error;
+    }
+  },
 };

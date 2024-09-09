@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { IPost } from "../interfaces/IPost";
 import axios, { AxiosResponse } from "axios";
 import { PostsService } from "../services/PostsService";
+import { IUser } from "../interfaces/IUser";
+import { userService } from "../services/UserService";
 
 export default function Admin() {
   const context = useContext(AppContext);
@@ -17,6 +19,7 @@ export default function Admin() {
   const { setToken } = context;
 
   const [posts, setPosts] = useState<IPost[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const tabListColor = useColorModeValue("gray.600", "gray.200");
 
@@ -38,9 +41,25 @@ export default function Admin() {
       }
     };
 
+    const getAllUsers = async () => {
+      try {
+        const response: AxiosResponse<IUser[]> = await userService.getAllUsers();
+        setUsers(response.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("Failed to fetch users", error.response?.data || error.message);
+        } else {
+          console.error("Failed to fetch users", error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (token) {
       setToken(token);
       getAllPosts();
+      getAllUsers();
     } else {
       setLoading(false);
       navigate("/login");
@@ -96,7 +115,7 @@ export default function Admin() {
             <pre>{JSON.stringify(posts, null, 2)}</pre>
           </TabPanel>
           <TabPanel padding={0}>
-            <p>User Manager</p>
+            <pre>{JSON.stringify(users, null, 2)}</pre>
           </TabPanel>
         </TabPanels>
       </Tabs>
