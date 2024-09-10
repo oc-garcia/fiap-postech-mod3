@@ -26,6 +26,7 @@ const registerSchema = z
   .object({
     username: z.string().min(1, "Username is required"),
     name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address").min(1, "Email is required"),
     cpf: z
       .string()
       .length(11, "CPF must be exactly 11 characters")
@@ -61,6 +62,7 @@ export default function Register() {
               initialValues={{
                 username: "",
                 name: "",
+                email: "",
                 cpf: "",
                 password: "",
                 confirmPassword: "",
@@ -114,6 +116,11 @@ export default function Register() {
                       <FormLabel htmlFor="name">Name</FormLabel>
                       <Field as={Input} id="name" name="name" type="text" variant="filled" />
                       <FormErrorMessage>{errors.name}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl isInvalid={!!errors.email && touched.email}>
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <Field as={Input} id="email" name="email" type="email" />
+                      <FormErrorMessage>{errors.email}</FormErrorMessage>
                     </FormControl>
                     <FormControl isInvalid={!!errors.cpf && touched.cpf}>
                       <FormLabel htmlFor="cpf">CPF</FormLabel>
