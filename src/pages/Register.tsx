@@ -119,7 +119,7 @@ export default function Register() {
                     </FormControl>
                     <FormControl isInvalid={!!errors.email && touched.email}>
                       <FormLabel htmlFor="email">Email</FormLabel>
-                      <Field as={Input} id="email" name="email" type="email" />
+                      <Field as={Input} id="email" name="email" type="text" variant="filled" />
                       <FormErrorMessage>{errors.email}</FormErrorMessage>
                     </FormControl>
                     <FormControl isInvalid={!!errors.cpf && touched.cpf}>
