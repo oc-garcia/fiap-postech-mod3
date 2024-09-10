@@ -1,4 +1,22 @@
-import { Flex, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useColorModeValue } from "@chakra-ui/react";
+import {
+  Card,
+  Flex,
+  Skeleton,
+  Tab,
+  Table,
+  TableCaption,
+  TableContainer,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
@@ -111,11 +129,64 @@ export default function Admin() {
         </TabList>
         <TabPanels>
           <TabPanel padding={0}>
-            <p>Post Manager</p>
-            <pre>{JSON.stringify(posts, null, 2)}</pre>
+            <Card>
+              <TableContainer>
+                <Table variant="simple" colorScheme="blackAlpha">
+                  <TableCaption>TOTAL: {posts.length}</TableCaption>
+                  <Thead>
+                    <Tr>
+                      <Th>ID</Th>
+                      <Th>Title</Th>
+                      <Th>Content</Th>
+                      <Th>Creation Date</Th>
+                      <Th>Update Date</Th>
+                      <Th>Author</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {posts.map((post: IPost) => (
+                      <Tr key={post.id}>
+                        <Td>{post.id}</Td>
+                        <Td>{post.title}</Td>
+                        <Td>{post.content}</Td>
+                        <Td>{post.creation_date ? new Date(post.creation_date).toLocaleString() : "N/A"}</Td>
+                        <Td>{post.update_date ? new Date(post.update_date).toLocaleString() : "N/A"}</Td>
+                        <Td>{post.author}</Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </Card>
           </TabPanel>
           <TabPanel padding={0}>
-            <pre>{JSON.stringify(users, null, 2)}</pre>
+            <Card>
+              <TableContainer>
+                <Table variant="simple" colorScheme="blackAlpha">
+                  <TableCaption>TOTAL: {users.length}</TableCaption>
+                  <Thead>
+                    <Tr>
+                      <Th>ID</Th>
+                      <Th>Username</Th>
+                      <Th>Name</Th>
+                      <Th>Email</Th>
+                      <Th>CPF</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {users.map((user) => (
+                      <Tr key={user.id}>
+                        <Td>{user.id}</Td>
+                        <Td>{user.username}</Td>
+                        <Td>{user.name}</Td>
+                        <Td>{user.email ? user.email : "N/A"}</Td>
+                        <Td>{user.cpf}</Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </Card>{" "}
           </TabPanel>
         </TabPanels>
       </Tabs>
