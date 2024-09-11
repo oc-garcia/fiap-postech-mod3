@@ -1,6 +1,21 @@
 import {
+  Button,
+  ButtonGroup,
   Card,
+  Center,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  IconButton,
+  Input,
   Skeleton,
   Tab,
   Table,
@@ -12,10 +27,13 @@ import {
   Tabs,
   Tbody,
   Td,
+  Textarea,
   Th,
   Thead,
   Tr,
   useColorModeValue,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
@@ -25,6 +43,15 @@ import axios, { AxiosResponse } from "axios";
 import { PostsService } from "../services/PostsService";
 import { IUser } from "../interfaces/IUser";
 import { userService } from "../services/UserService";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { Formik, Field, Form } from "formik";
+import { z } from "zod";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+
+const postSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+});
 
 export default function Admin() {
   const context = useContext(AppContext);
@@ -34,55 +61,89 @@ export default function Admin() {
     throw new Error("MyComponent must be used within an AppProvider");
   }
 
-  const { setToken } = context;
+  const { token, setToken } = context;
 
   const [posts, setPosts] = useState<IPost[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const tabListColor = useColorModeValue("gray.600", "gray.200");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
 
-    const getAllPosts = async () => {
-      try {
-        const response: AxiosResponse<IPost[]> = await PostsService.getAll();
-        setPosts(response.data);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Failed to fetch posts", error.response?.data || error.message);
-        } else {
-          console.error("Failed to fetch posts", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const getAllUsers = async () => {
-      try {
-        const response: AxiosResponse<IUser[]> = await userService.getAllUsers();
-        setUsers(response.data);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Failed to fetch users", error.response?.data || error.message);
-        } else {
-          console.error("Failed to fetch users", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (token) {
       setToken(token);
-      getAllPosts();
-      getAllUsers();
+      fetchAllPosts();
+      fetchAllUsers();
     } else {
       setLoading(false);
       navigate("/login");
     }
   }, [setToken, navigate]);
+
+  const fetchAllPosts = async () => {
+    try {
+      const response: AxiosResponse<IPost[]> = await PostsService.getAll();
+      setPosts(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Failed to fetch posts", error.response?.data || error.message);
+      } else {
+        console.error("Failed to fetch posts", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      const response: AxiosResponse<IUser[]> = await userService.getAllUsers();
+      setUsers(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Failed to fetch users", error.response?.data || error.message);
+      } else {
+        console.error("Failed to fetch users", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditClick = (post: IPost) => {
+    setSelectedPost(post);
+    onOpen();
+  };
+
+  const handleFormSubmit = async (values: IPost) => {
+    if (selectedPost && selectedPost.id !== undefined) {
+      try {
+        await PostsService.put(selectedPost.id, { ...values, author: selectedPost.author }, token ? token : "");
+        fetchAllPosts();
+        onClose();
+        toast({
+          title: `Post updated successfully`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error("Failed to update post", error);
+        toast({
+          title: `Failed to update post`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } else {
+      console.error("Selected post is invalid");
+    }
+  };
 
   if (loading) {
     return (
@@ -93,6 +154,7 @@ export default function Admin() {
       </Flex>
     );
   }
+
   return (
     <Flex flexDirection={"column"} gap={"1rem"}>
       <Tabs isFitted variant="unstyled">
@@ -141,6 +203,7 @@ export default function Admin() {
                       <Th>Creation Date</Th>
                       <Th>Update Date</Th>
                       <Th>Author</Th>
+                      <Th>Actions</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -152,6 +215,16 @@ export default function Admin() {
                         <Td>{post.creation_date ? new Date(post.creation_date).toLocaleString() : "N/A"}</Td>
                         <Td>{post.update_date ? new Date(post.update_date).toLocaleString() : "N/A"}</Td>
                         <Td>{post.author}</Td>
+                        <Td>
+                          <ButtonGroup size="sm" isAttached variant="outline">
+                            <IconButton
+                              onClick={() => handleEditClick(post)}
+                              aria-label="Edit post"
+                              icon={<EditIcon />}
+                            />
+                            <IconButton aria-label="Delete post" icon={<DeleteIcon />} />
+                          </ButtonGroup>
+                        </Td>
                       </Tr>
                     ))}
                   </Tbody>
@@ -186,10 +259,56 @@ export default function Admin() {
                   </Tbody>
                 </Table>
               </TableContainer>
-            </Card>{" "}
+            </Card>
           </TabPanel>
         </TabPanels>
       </Tabs>
+      <Drawer isOpen={isOpen} placement="right" size="full" onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Edit Post</DrawerHeader>
+
+          <DrawerBody>
+            {selectedPost && (
+              <Formik
+                initialValues={{
+                  title: selectedPost.title,
+                  content: selectedPost.content,
+                }}
+                validationSchema={toFormikValidationSchema(postSchema)}
+                onSubmit={handleFormSubmit}>
+                {({ errors, touched }) => (
+                  <Form id="edit-post-form">
+                    <FormControl isInvalid={!!errors.title && touched.title}>
+                      <FormLabel htmlFor="title">Title</FormLabel>
+                      <Field as={Input} id="title" name="title" />
+                      <FormErrorMessage>{errors.title}</FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.content && touched.content}>
+                      <FormLabel htmlFor="content">Content</FormLabel>
+                      <Field as={Textarea} resize={"vertical"} size={"lg"} id="content" name="content" />
+                      <FormErrorMessage>{errors.content}</FormErrorMessage>
+                    </FormControl>
+                  </Form>
+                )}
+              </Formik>
+            )}
+          </DrawerBody>
+
+          <DrawerFooter width={"100%"}>
+            <Center width={"100%"}>
+              <Button variant="outline" mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button bg={"pink.400"} type="submit" form="edit-post-form">
+                Save
+              </Button>
+            </Center>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </Flex>
   );
 }

@@ -216,13 +216,35 @@ const MobileNav = () => {
     throw new Error("MyComponent must be used within an AppProvider");
   }
 
-  const { token } = context;
+  const { token, setToken } = context;
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setToken("");
+    localStorage.removeItem("authToken");
+    navigate("/login");
+  };
+
+  const bgColor = useColorModeValue("white", "gray.800");
+  const buttonColor = useColorModeValue("gray.600", "gray.200");
 
   return (
-    <Stack bg={useColorModeValue("white", "gray.800")} p={4} display={{ md: "none" }}>
+    <Stack bg={bgColor} p={4} display={{ md: "none" }}>
       {NAV_ITEMS.filter((navItem) => navItem.label !== "Admin" || token).map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
+      {token && (
+        <Button
+          variant={"link"}
+          display={{ base: "inline", md: "none" }}
+          fontWeight={600}
+          color={buttonColor}
+          py={2}
+          onClick={handleLogout}>
+          Log Out
+        </Button>
+      )}
     </Stack>
   );
 };

@@ -83,7 +83,8 @@ export const PostsService = {
   },
   put: async (
     id: number,
-    post: Partial<Omit<IPost, "id" | "creation_date" | "update_date">>
+    post: Partial<Omit<IPost, "id" | "creation_date" | "update_date">>,
+    token: string
   ): Promise<AxiosResponse<IPost> | AxiosError> => {
     const config = {
       method: "put",
@@ -91,6 +92,7 @@ export const PostsService = {
       url: `${baseUrl}/post/${id}`,
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       data: post,
     };
