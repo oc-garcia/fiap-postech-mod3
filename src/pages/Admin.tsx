@@ -16,6 +16,13 @@ import {
   FormLabel,
   IconButton,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Skeleton,
   Tab,
   Table,
@@ -68,7 +75,8 @@ export default function Admin() {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const tabListColor = useColorModeValue("gray.600", "gray.200");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const drawerDisclosure = useDisclosure();
+  const modalDisclosure = useDisclosure();
   const toast = useToast();
 
   useEffect(() => {
@@ -116,7 +124,11 @@ export default function Admin() {
 
   const handleEditClick = (post: IPost) => {
     setSelectedPost(post);
-    onOpen();
+    drawerDisclosure.onOpen();
+  };
+
+  const handleDeleteClick = (postId: number) => {
+    modalDisclosure.onOpen();
   };
 
   const handleFormSubmit = async (values: IPost) => {
@@ -124,7 +136,7 @@ export default function Admin() {
       try {
         await PostsService.put(selectedPost.id, { ...values, author: selectedPost.author }, token ? token : "");
         fetchAllPosts();
-        onClose();
+        drawerDisclosure.onClose();
         toast({
           title: `Post updated successfully`,
           status: "success",
@@ -222,7 +234,11 @@ export default function Admin() {
                               aria-label="Edit post"
                               icon={<EditIcon />}
                             />
-                            <IconButton aria-label="Delete post" icon={<DeleteIcon />} />
+                            <IconButton
+                              aria-label="Delete post"
+                              icon={<DeleteIcon />}
+                              onClick={() => handleDeleteClick(post.id)}
+                            />
                           </ButtonGroup>
                         </Td>
                       </Tr>
@@ -263,7 +279,7 @@ export default function Admin() {
           </TabPanel>
         </TabPanels>
       </Tabs>
-      <Drawer isOpen={isOpen} placement="right" size="full" onClose={onClose}>
+      <Drawer isOpen={drawerDisclosure.isOpen} placement="right" size="full" onClose={drawerDisclosure.onClose}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -299,16 +315,46 @@ export default function Admin() {
 
           <DrawerFooter width={"100%"}>
             <Center width={"100%"}>
-              <Button variant="outline" mr={3} onClick={onClose}>
+              <Button variant="outline" mr={3} onClick={drawerDisclosure.onClose}>
                 Cancel
               </Button>
-              <Button bg={"pink.400"} type="submit" form="edit-post-form">
+              <Button
+                color={"white"}
+                bg={"pink.400"}
+                _hover={{
+                  bg: "pink.300",
+                }}
+                type="submit"
+                form="edit-post-form">
                 Save
               </Button>
             </Center>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+
+      <Modal isOpen={modalDisclosure.isOpen} onClose={modalDisclosure.onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Deletion</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>Are you sure you want to delete this post?</ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={modalDisclosure.onClose}>
+              Close
+            </Button>
+            <Button
+              color={"white"}
+              bg={"pink.400"}
+              _hover={{
+                bg: "pink.300",
+              }}>
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 }
