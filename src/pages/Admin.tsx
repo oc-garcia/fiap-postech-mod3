@@ -129,6 +129,7 @@ export default function Admin() {
 
   const handleDeleteClick = (postId: number) => {
     modalDisclosure.onOpen();
+    console.log("Delete post with ID:", postId);
   };
 
   const handleFormSubmit = async (values: IPost) => {
@@ -237,7 +238,11 @@ export default function Admin() {
                             <IconButton
                               aria-label="Delete post"
                               icon={<DeleteIcon />}
-                              onClick={() => handleDeleteClick(post.id)}
+                              onClick={() => {
+                                if (post.id !== undefined) {
+                                  handleDeleteClick(post.id);
+                                }
+                              }}
                             />
                           </ButtonGroup>
                         </Td>
