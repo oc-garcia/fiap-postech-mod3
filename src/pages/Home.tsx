@@ -70,11 +70,9 @@ export default function Home() {
 
     if (token) {
       setToken(token);
-      getAllPosts();
-    } else {
-      setLoading(false);
-      navigate("/login");
     }
+
+    getAllPosts();
   }, [setToken, navigate]);
 
   const handleKeywordSearch = async () => {

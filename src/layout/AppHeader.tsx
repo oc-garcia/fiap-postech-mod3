@@ -167,19 +167,9 @@ const DesktopNav = () => {
   const { token } = context;
 
   const navigate = useNavigate();
-  const toast = useToast();
 
   const handleNavigate = (href: string | undefined) => {
-    if (!token) {
-      toast({
-        title: `You need to be logged in to access this page`,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      navigate(href ?? "#");
-    }
+    navigate(href ?? "#");
   };
 
   return (
@@ -245,6 +235,17 @@ const MobileNav = () => {
           Log Out
         </Button>
       )}
+      {!token && (
+        <Button
+          variant={"link"}
+          display={{ base: "inline", md: "none" }}
+          fontWeight={600}
+          color={buttonColor}
+          py={2}
+          onClick={() => navigate("/login")}>
+          Log In
+        </Button>
+      )}
     </Stack>
   );
 };
@@ -255,22 +256,11 @@ const MobileNavItem = ({ label, href }: NavItem) => {
   if (!context) {
     throw new Error("MyComponent must be used within an AppProvider");
   }
-  const toast = useToast();
 
-  const { token } = context;
   const navigate = useNavigate();
 
   const handleNavigate = (href: string | undefined) => {
-    if (!token) {
-      toast({
-        title: `You need to be logged in to access this page`,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      navigate(href ?? "#");
-    }
+    navigate(href ?? "#");
   };
 
   return (
