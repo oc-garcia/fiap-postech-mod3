@@ -14,7 +14,6 @@ import {
   useBreakpointValue,
   useDisclosure,
   useColorMode,
-  useToast,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";

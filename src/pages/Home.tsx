@@ -11,9 +11,18 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Center,
   Divider,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   Heading,
+  IconButton,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -28,9 +37,10 @@ import {
   Tabs,
   Text,
   useColorModeValue,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon, ViewIcon } from "@chakra-ui/icons";
 
 export default function Home() {
   const context = useContext(AppContext);
@@ -49,6 +59,13 @@ export default function Home() {
   const [keyword, setKeyword] = useState<string>("");
   const [keywordSearchResults, setKeywordSearchResults] = useState<IPost[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const drawerDisclosure = useDisclosure();
+  const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
+
+  const handleViewClick = (post: IPost) => {
+    setSelectedPost(post);
+    drawerDisclosure.onOpen();
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -103,7 +120,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Flex minHeight={"50vh"} flexDirection={"column"} gap={"1rem"}>
+      <Flex flex={1} flexDirection={"column"} gap={"1rem"}>
         <Skeleton flex={"1"} />
         <Skeleton flex={"1"} />
         <Skeleton flex={"1"} />
@@ -112,7 +129,7 @@ export default function Home() {
   }
 
   return (
-    <Flex flexDirection={"column"}>
+    <Flex flex={1} flexDirection={"column"}>
       <Tabs isFitted variant="unstyled">
         <TabList mb="1em" color={tabListColor}>
           <Tab
@@ -151,7 +168,19 @@ export default function Home() {
               {posts.map((post) => (
                 <Card key={post.id}>
                   <CardHeader>
-                    <Heading size="md">{post.title}</Heading>
+                    <Flex justifyContent={"space-between"} alignItems={"center"}>
+                      <Heading size="md">{post.title}</Heading>
+                      <IconButton
+                        onClick={() => handleViewClick(post)}
+                        icon={<ViewIcon />}
+                        aria-label="View Post"
+                        color={"white"}
+                        bg={"pink.400"}
+                        _hover={{
+                          bg: "pink.300",
+                        }}
+                      />
+                    </Flex>
                   </CardHeader>
                   <Divider />
                   <CardBody>
@@ -202,7 +231,19 @@ export default function Home() {
                 {keywordSearchResults.map((post) => (
                   <Card key={post.id}>
                     <CardHeader>
-                      <Heading size="md">{post.title}</Heading>
+                      <Flex justifyContent={"space-between"} alignItems={"center"}>
+                        <Heading size="md">{post.title}</Heading>
+                        <IconButton
+                          onClick={() => handleViewClick(post)}
+                          icon={<ViewIcon />}
+                          aria-label="View Post"
+                          color={"white"}
+                          bg={"pink.400"}
+                          _hover={{
+                            bg: "pink.300",
+                          }}
+                        />
+                      </Flex>{" "}
                     </CardHeader>
                     <Divider />
                     <CardBody>
@@ -229,6 +270,35 @@ export default function Home() {
           </TabPanel>
         </TabPanels>
       </Tabs>
+      <Drawer isOpen={drawerDisclosure.isOpen} placement="right" size="full" onClose={drawerDisclosure.onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>{selectedPost?.title}</DrawerHeader>
+          <DrawerBody>
+            <Text>{selectedPost?.content}</Text>
+          </DrawerBody>
+          <DrawerFooter width={"100%"}>
+            <Center width={"100%"}>
+              <Flex gap={2} alignItems={"center"} justifyContent={"center"}>
+                <Text>Author: {selectedPost?.author}</Text>
+                {selectedPost?.creation_date && (
+                  <>
+                    <Divider height="2rem" orientation="vertical" />
+                    <Text>Created: {new Date(selectedPost.creation_date).toLocaleString("pt-BR")}</Text>
+                  </>
+                )}
+                {selectedPost?.update_date && (
+                  <>
+                    <Divider height="2rem" orientation="vertical" />
+                    <Text>Updated: {new Date(selectedPost.update_date).toLocaleString("pt-BR")}</Text>
+                  </>
+                )}
+              </Flex>
+            </Center>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </Flex>
   );
 }
