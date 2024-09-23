@@ -186,7 +186,7 @@ export default function Home() {
                   <CardBody>
                     <Box>
                       <Text pt="2" fontSize="sm">
-                        {post.content}
+                        {`${post.content.substring(0, 100)}...`}
                       </Text>
                     </Box>
                   </CardBody>

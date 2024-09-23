@@ -77,6 +77,7 @@ export default function Admin() {
   const tabListColor = useColorModeValue("gray.600", "gray.200");
   const drawerDisclosure = useDisclosure();
   const modalDisclosure = useDisclosure();
+  const createDrawerDisclosure = useDisclosure();
   const toast = useToast();
 
   useEffect(() => {
@@ -127,15 +128,39 @@ export default function Admin() {
     drawerDisclosure.onOpen();
   };
 
-  const handleDeleteClick = (postId: number) => {
+  const handleDeleteClick = async (post: IPost) => {
+    setSelectedPost(post);
     modalDisclosure.onOpen();
-    console.log("Delete post with ID:", postId);
+  };
+
+  const deletePost = async () => {
+    if (selectedPost && selectedPost.id !== undefined) {
+      try {
+        await PostsService.delete(selectedPost.id, token ? token : "");
+        fetchAllPosts();
+        modalDisclosure.onClose();
+        toast({
+          title: `Post deleted successfully`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error("Failed to delete post", error);
+        toast({
+          title: `Failed to delete post`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    }
   };
 
   const handleFormSubmit = async (values: IPost) => {
     if (selectedPost && selectedPost.id !== undefined) {
       try {
-        await PostsService.put(selectedPost.id, { ...values, author: selectedPost.author }, token ? token : "");
+        await PostsService.put(selectedPost.id, values, token ? token : "");
         fetchAllPosts();
         drawerDisclosure.onClose();
         toast({
@@ -155,6 +180,28 @@ export default function Admin() {
       }
     } else {
       console.error("Selected post is invalid");
+    }
+  };
+
+  const handleCreateFormSubmit = async (values: IPost) => {
+    try {
+      await PostsService.create(values, token ? token : "");
+      fetchAllPosts();
+      createDrawerDisclosure.onClose();
+      toast({
+        title: `Post created successfully`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Failed to create post", error);
+      toast({
+        title: `Failed to create post`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -204,6 +251,11 @@ export default function Admin() {
         </TabList>
         <TabPanels>
           <TabPanel padding={0}>
+            <Card marginBottom={"1rem"}>
+              <Button onClick={() => createDrawerDisclosure.onOpen()} fontWeight={"bold"}>
+                CREATE POST
+              </Button>
+            </Card>
             <Card>
               <TableContainer>
                 <Table variant="simple" colorScheme="blackAlpha">
@@ -224,7 +276,7 @@ export default function Admin() {
                       <Tr key={post.id}>
                         <Td>{post.id}</Td>
                         <Td>{post.title}</Td>
-                        <Td>{post.content}</Td>
+                        <Td>{`${post.content.substring(0, 100)}...`}</Td>
                         <Td>{post.creation_date ? new Date(post.creation_date).toLocaleString() : "N/A"}</Td>
                         <Td>{post.update_date ? new Date(post.update_date).toLocaleString() : "N/A"}</Td>
                         <Td>{post.author}</Td>
@@ -240,7 +292,7 @@ export default function Admin() {
                               icon={<DeleteIcon />}
                               onClick={() => {
                                 if (post.id !== undefined) {
-                                  handleDeleteClick(post.id);
+                                  handleDeleteClick(post);
                                 }
                               }}
                             />
@@ -284,6 +336,7 @@ export default function Admin() {
           </TabPanel>
         </TabPanels>
       </Tabs>
+
       <Drawer isOpen={drawerDisclosure.isOpen} placement="right" size="full" onClose={drawerDisclosure.onClose}>
         <DrawerOverlay />
         <DrawerContent>
@@ -338,6 +391,62 @@ export default function Admin() {
         </DrawerContent>
       </Drawer>
 
+      <Drawer
+        isOpen={createDrawerDisclosure.isOpen}
+        placement="right"
+        size="full"
+        onClose={createDrawerDisclosure.onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Create Post</DrawerHeader>
+
+          <DrawerBody>
+            <Formik
+              initialValues={{
+                title: "",
+                content: "",
+              }}
+              validationSchema={toFormikValidationSchema(postSchema)}
+              onSubmit={handleCreateFormSubmit}>
+              {({ errors, touched }) => (
+                <Form id="edit-post-form">
+                  <FormControl isInvalid={!!errors.title && touched.title}>
+                    <FormLabel htmlFor="title">Title</FormLabel>
+                    <Field as={Input} id="title" name="title" />
+                    <FormErrorMessage>{errors.title}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.content && touched.content}>
+                    <FormLabel htmlFor="content">Content</FormLabel>
+                    <Field as={Textarea} resize={"vertical"} size={"lg"} id="content" name="content" />
+                    <FormErrorMessage>{errors.content}</FormErrorMessage>
+                  </FormControl>
+                </Form>
+              )}
+            </Formik>
+          </DrawerBody>
+
+          <DrawerFooter width={"100%"}>
+            <Center width={"100%"}>
+              <Button variant="outline" mr={3} onClick={createDrawerDisclosure.onClose}>
+                Cancel
+              </Button>
+              <Button
+                color={"white"}
+                bg={"pink.400"}
+                _hover={{
+                  bg: "pink.300",
+                }}
+                type="submit"
+                form="edit-post-form">
+                Save
+              </Button>
+            </Center>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
       <Modal isOpen={modalDisclosure.isOpen} onClose={modalDisclosure.onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -350,6 +459,7 @@ export default function Admin() {
               Close
             </Button>
             <Button
+              onClick={deletePost}
               color={"white"}
               bg={"pink.400"}
               _hover={{

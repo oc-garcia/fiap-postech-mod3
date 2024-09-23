@@ -59,7 +59,8 @@ export const PostsService = {
     }
   },
   create: async (
-    post: Omit<IPost, "id" | "creation_date" | "update_date">
+    post: Omit<IPost, "id" | "creation_date" | "update_date">,
+    token: string
   ): Promise<AxiosResponse<IPost> | AxiosError> => {
     const config = {
       method: "post",
@@ -67,6 +68,7 @@ export const PostsService = {
       url: `${baseUrl}/post`,
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       data: post,
     };
@@ -107,12 +109,15 @@ export const PostsService = {
       throw error as AxiosError;
     }
   },
-  delete: async (id: number): Promise<AxiosResponse<void> | AxiosError> => {
+  delete: async (id: number, token: string): Promise<AxiosResponse<void> | AxiosError> => {
     const config = {
       method: "delete",
       maxBodyLength: Infinity,
       url: `${baseUrl}/post/${id}`,
-      headers: {},
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     };
 
     try {
