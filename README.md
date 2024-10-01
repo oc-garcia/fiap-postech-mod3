@@ -1,89 +1,128 @@
-# FIAP Blogging
+# Frontend-Blogging
 
-<img src="src\assets\imgs\fiap-blog-home.png" alt="Página inicial do blog">
+## Descrição
 
-> Projeto de front end para o tech challenge 3 Pós tech FIAP Full Stack Development
+Este é o frontend de um blog escolar, desenvolvido como parte do desafio técnico do módulo 3 da pós-graduação em Tecnologia da FIAP. O projeto é destinado ao uso por professores e alunos.
 
-## 💻 Pré-requisitos
+## Experiência de Desenvolvimento
 
-Antes de começar, verifique se você atendeu aos seguintes requisitos:
+Durante o desenvolvimento, um dos principais desafios foi a integração com o backend e a configuração do ambiente de desenvolvimento utilizando Vite. A escolha do Vite como ferramenta de build e desenvolvimento se mostrou eficiente devido à sua rapidez e simplicidade. Além disso, a utilização de bibliotecas como Chakra UI e Formik facilitou a criação de uma interface de usuário moderna e responsiva.
 
-- Ter o Node e npm instalados
-- Ter uma IDE instalada como VsCode
-- Ou apenas acessar o link https://fiap-postech-mod3.vercel.app/ para ver o projeto no ar
+## Arquitetura
 
-Obs: Caso os posts não carreguem no acesso, abra https://blogging-back.onrender.com/ em uma nova guia, para executar o backend 
+O projeto segue uma arquitetura modular e escalável, utilizando as seguintes tecnologias e padrões:
 
-## 🚀 Instalando FIAP Blogging
+- React: Biblioteca para construção de interfaces de usuário.
+- Vite: Ferramenta de build e desenvolvimento rápida para projetos frontend.
+- TypeScript: Superset do JavaScript que adiciona tipagem estática ao código.
+- Chakra UI: Biblioteca de componentes de interface de usuário.
+- Formik: Biblioteca para construção de formulários.
+- Axios: Cliente HTTP para realizar requisições ao backend.
+- Zod: Biblioteca de validação de esquemas para validação de dados.
+- ESLint e Prettier: Ferramentas de linting e formatação de código para manter a consistência do código.
+- Context API: Utilizado para gerenciamento de estado global da aplicação.
 
-Para instalar o FIAP Blogging, siga estas etapas:
 
+A estrutura do projeto é organizada da seguinte forma:
+
+- src/: Contém todo o código fonte do projeto.
+- components/: Contém os componentes reutilizáveis da interface de usuário.
+- pages/: Contém as páginas da aplicação.
+- services/: Contém os serviços para comunicação com o backend.
+- layout/: Contém a estrutura de layout da aplicação.
+- context/: Contém os contextos para gerenciamento de estado global.
+- router.tsx: Componente principal da aplicação.
+- main.tsx: Arquivo de entrada do projeto.
+
+## Como Rodar o Projeto
+
+1. Clone o repositório:
+
+```bash
+ git clone https://github.com/oc-garcia/fiap-postech-mod3.git
+ cd fiap-postech-mod3
 ```
-npm install
+
+2. Instale as dependências:
+
+```bash
+ npm install
 ```
 
-Após a instalação:
+3. Crie um arquivo .env com as seguintes variáveis:
 
-```
-npm run dev
+```bash
+   VITE_API_URL=
 ```
 
-assim conseguirá acessar o front via localhost através da porta que aparecerá no terminal
+4. Rodando em modo de desenvolvimento:
+
+```bash
+   npm run dev
+```
+
+5. Para construir o projeto:
+
+```bash
+   npm run build
+```
+## Links Úteis
+
+- Deploy da Aplicação: https://fiap-postech-mod3.vercel.app/
+- Repositório do Back-End: https://github.com/oc-garcia/fiap-postech-mod2
 
 ## ☕ Usando FIAP Blogging
 
-Para usar FIAP Blogging, siga estas etapas:
+<img src="src\assets\imgs\fiap-blog-home.png" alt="Página inicial do blog">
 
-### Visualizar posts
+Siga as etapas abaixo para aproveitar ao máximo o FIAP Blogging:
 
-Para visualizar posts, clique no ícone de 'olho' no canto superior direito do card de post, assim você conseguirá ler o texto completo do post
+### Visualizando Posts
+
+Para ler um post completo, clique no ícone de 'olho' localizado no canto superior direito do card do post. Assim, você poderá visualizar todo o conteúdo do post.
 
 ### Cadastro
 
-Para conseguir criar e editar posts, é necessário criar um cadastro na plataforma, clicando no botão de `Sign UP` você será redirecionado(a) para a página de cadastro:
+Para criar e editar posts, é necessário se cadastrar na plataforma. Clique no botão Sign Up para ser redirecionado(a) à página de cadastro:
 
-<img src="src\assets\imgs\fiap-blog-cadastro.png" alt="Página cadastro do blog">
+<img src="src\assets\imgs\fiap-blog-cadastro.png" alt="Página de cadastro do blog">
 
-Preenchendo as informações e clicando em `Register` seu cadastro será realizado!
+Preencha os campos necessários e clique em Register para completar o cadastro.
 
 ### Login
 
-clicando no botão de `Log in` você será redirecionado(a) para a página de login:
+Para acessar sua conta, clique no botão Log in, que irá levá-lo(a) à página de login:
 
-<img src="src\assets\imgs\fiap-blog-login.png" alt="Página login do blog">
+<img src="src\assets\imgs\fiap-blog-login.png" alt="Página de login do blog">
 
-Após preencher as informações e clicar em `Login`, você estará logado(a) na plataforma.
+Insira suas credenciais e clique em Login para acessar a plataforma.
 
 ### Pesquisando posts
 
-É possível pesquisar posts a partir da aba `Search Posts`, disponível na home, digitando uma palavra do título, o post deve aparecer nos resultados de busca:
+Na página inicial, você pode utilizar a aba Search Posts para encontrar posts digitando palavras-chave do título. Os resultados aparecerão automaticamente:
 
 <img src="src\assets\imgs\fiap-blog-search.png" alt="Página search do blog">
 
 ### Criando posts
 
-A partir do login é liberada uma nova aba superior chamada `Admin`, por ela serão feitas as criações, edições e exclusões de posts
+Após fazer login, a aba Admin será liberada. Nela, você pode gerenciar a criação, edição e exclusão de posts.
 
-Clicando no botão `CREATE POST` será possível criar um novo post:
+Para criar um novo post, clique no botão Create Post:
 
 ![Botão create post](src\assets\imgs\fiap-blog-botao-create.png)
 
-assim abrirá uma nova página para a criação de um novo post.
-
 ### Editando posts
 
-Para editar posts, basta clicar no ícone de edicão, disponível na lista de posts na aba de `Post Manager`
+Para editar um post, vá até a aba Post Manager e clique no ícone de edição ao lado do post que deseja alterar:
 
 ![Botão editar post](src\assets\imgs\fiap-blog-editar.png)
 
-
 ### Excluindo posts
 
-Para excluir posts, basta clicar no ícone de exclusão, disponível na lista de posts, na aba de `Post Manager`
+Para excluir um post, vá até a aba Post Manager e clique no ícone de lixeira ao lado do post que deseja remover:
 
 ![Botão editar post](src\assets\imgs\fiap-blog-excluir.png)
 
 ### Informações de usuários
 
-Na aba de `User Manager` estarão disponíveis as informações dos usuários.
-
+Na aba User Manager, você pode visualizar e gerenciar as informações dos usuários da plataforma.
