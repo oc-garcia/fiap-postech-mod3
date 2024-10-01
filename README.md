@@ -22,7 +22,6 @@ O projeto segue uma arquitetura modular e escalável, utilizando as seguintes te
 - ESLint e Prettier: Ferramentas de linting e formatação de código para manter a consistência do código.
 - Context API: Utilizado para gerenciamento de estado global da aplicação.
 
-
 A estrutura do projeto é organizada da seguinte forma:
 
 - src/: Contém todo o código fonte do projeto.
@@ -66,6 +65,21 @@ A estrutura do projeto é organizada da seguinte forma:
 ```bash
    npm run build
 ```
+
+## Rodando em Docker
+
+1. Crie o container:
+
+```bash
+docker build -t app-name .
+```
+
+2. Rode o Container:
+
+```bash
+docker run -p 3000:3000 app-name
+```
+
 ## Links Úteis
 
 - Deploy da Aplicação: https://fiap-postech-mod3.vercel.app/
@@ -126,3 +140,4 @@ Para excluir um post, vá até a aba Post Manager e clique no ícone de lixeira 
 ### Informações de usuários
 
 Na aba User Manager, você pode visualizar e gerenciar as informações dos usuários da plataforma.
+````
