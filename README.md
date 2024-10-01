@@ -123,21 +123,20 @@ Após fazer login, a aba Admin será liberada. Nela, você pode gerenciar a cria
 
 Para criar um novo post, clique no botão Create Post:
 
-![Botão create post](src\assets\imgs\fiap-blog-botao-create.png)
+<img src="src\assets\imgs\fiap-blog-botao-create.png" alt="Botao de Create">
 
 ### Editando posts
 
 Para editar um post, vá até a aba Post Manager e clique no ícone de edição ao lado do post que deseja alterar:
 
-![Botão editar post](src\assets\imgs\fiap-blog-editar.png)
+<img src="src\assets\imgs\fiap-blog-editar.png" alt="Botão editar post">
 
 ### Excluindo posts
 
 Para excluir um post, vá até a aba Post Manager e clique no ícone de lixeira ao lado do post que deseja remover:
 
-![Botão editar post](src\assets\imgs\fiap-blog-excluir.png)
+<img src="src\assets\imgs\fiap-blog-excluir.png" alt="Botão excluir post">
 
 ### Informações de usuários
 
 Na aba User Manager, você pode visualizar e gerenciar as informações dos usuários da plataforma.
-````
