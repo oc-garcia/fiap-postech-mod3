@@ -82,7 +82,7 @@ docker run -p 3000:3000 app-name
 
 ## Links Úteis
 
-- Deploy da Aplicação: https://fiap-postech-mod3.vercel.app/
+- Deploy da Aplicação: https://fiap-postech-mod3.vercel.app/ (INSTÂNCIA DO DB FOI RETIRADA APÓS AVALIAÇÃO DO PROJETO.)
 - Repositório do Back-End: https://github.com/oc-garcia/fiap-postech-mod2
 
 ## ☕ Usando FIAP Blogging
